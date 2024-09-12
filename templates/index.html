@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body>
+    <h1>Gerenciador de Gastos</h1>
+
+    <!-- Formulário para adicionar um novo gasto -->
+    <form method="POST">
+        <label for="description">Descrição:</label>
+        <input type="text" id="description" name="description" required>
+        <label for="amount">Valor (R$):</label>
+        <input type="number" id="amount" name="amount" step="0.01" required>
+        <button type="submit">Adicionar Gasto</button>
+    </form>
+
+    <!-- Lista de gastos registrados -->
+    <h2>Gastos Registrados</h2>
+    <ul>
+        {% for expense in expenses %}
+        <li>
+            {{ loop.index }}. {{ expense.description }}: R$ {{ expense.amount }}
+            <form action="{{ url_for('delete_expense', index=loop.index0) }}" method="POST" style="display: inline;">
+                <button type="submit" class="delete-button">Remover</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <p>Total: R$ {{ total }}</p>
+
+    <!-- Formulário para enviar o email -->
+    <form action="{{ url_for('email') }}" method="POST" id="emailForm">
+        <label for="to_email">Email para envio do relatório:</label>
+        <input type="email" id="to_email" name="to_email" required>
+        <button type="submit">Enviar Relatório por E-mail</button>
+    </form>
+</body>
+
+</html>
