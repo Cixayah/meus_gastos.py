@@ -17,6 +17,8 @@ app.secret_key = os.getenv(
 class ExpenseManager:
     @staticmethod
     def add_expense(description, amount):
+        if amount <= 0:
+            raise ValueError("O valor do gasto deve ser maior que 0.")
         if "expenses" not in session:
             session["expenses"] = []
         session["expenses"].append({"description": description, "amount": amount})
@@ -42,14 +44,17 @@ class ExpenseManager:
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        description = request.form["description"]
-        amount = float(request.form["amount"])
-        ExpenseManager.add_expense(description, amount)
+        try:
+            description = request.form["description"]
+            amount = float(request.form["amount"])
+            ExpenseManager.add_expense(description, amount)
+        except ValueError as e:
+            return f"Erro: {e}", 400  # Retorna erro se o valor for inválido
         return redirect(url_for("index"))
 
     expenses = ExpenseManager.show_expenses()
     total = ExpenseManager.calculate_total()
-    return render_template("index.html", expenses=expenses, total=total)
+    return render_template("index.html", expenses=expenses, total=f"{total:.2f}")
 
 
 # Remover gasto
