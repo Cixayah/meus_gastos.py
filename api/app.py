@@ -95,12 +95,15 @@ def send_email(
     msg.attach(MIMEText(body, "plain"))
 
     try:
+        # Conexão com o servidor SMTP
         with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(login, password)
+            server.ehlo()  # Identificação com o servidor SMTP
+            server.starttls()  # Inicia a conexão segura
+            server.ehlo()  # Necessário após o starttls()
+            server.login(login, password)  # Autenticação
             server.send_message(msg)
             print("Email enviado com sucesso!")
-    except Exception as e:
+    except smtplib.SMTPException as e:
         print(f"Falha ao enviar o email: {e}")
 
 
