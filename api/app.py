@@ -17,8 +17,7 @@ app.secret_key = os.getenv(
 class ExpenseManager:
     @staticmethod
     def add_expense(description, amount):
-        if amount <= 0:
-            raise ValueError("O valor do gasto deve ser maior que 0.")
+
         if "expenses" not in session:
             session["expenses"] = []
         session["expenses"].append({"description": description, "amount": amount})
