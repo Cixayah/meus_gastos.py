@@ -10,8 +10,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv(
-    "SECRET_KEY", "chave_secreta_fallback"
-)  # Defina uma chave secreta para as sessões
+    "SECRET_KEY"
+)  
 
 
 class ExpenseManager:
