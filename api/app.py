@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -9,29 +9,29 @@ import smtplib
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")  # Defina uma chave secreta para as sessões
 
 
 class ExpenseManager:
-    def __init__(self):
-        self.expenses = []
+    @staticmethod
+    def add_expense(description, amount):
+        if "expenses" not in session:
+            session["expenses"] = []
+        session["expenses"].append({"description": description, "amount": amount})
 
-    def add_expense(self, description, amount):
-        self.expenses.append({"description": description, "amount": amount})
+    @staticmethod
+    def show_expenses():
+        return session.get("expenses", [])
 
-    def show_expenses(self):
-        return self.expenses
+    @staticmethod
+    def calculate_total():
+        return sum(expense["amount"] for expense in session.get("expenses", []))
 
-    def calculate_total(self):
-        return sum(expense["amount"] for expense in self.expenses)
-
-    def delete_expense(self, index):
+    @staticmethod
+    def delete_expense(index):
         """Remove o gasto pelo índice."""
-        if 0 <= index < len(self.expenses):
-            del self.expenses[index]
-
-
-# Gerenciando gastos
-manager = ExpenseManager()
+        if "expenses" in session and 0 <= index < len(session["expenses"]):
+            session["expenses"].pop(index)
 
 
 # Página principal
@@ -40,18 +40,18 @@ def index():
     if request.method == "POST":
         description = request.form["description"]
         amount = float(request.form["amount"])
-        manager.add_expense(description, amount)
+        ExpenseManager.add_expense(description, amount)
         return redirect(url_for("index"))
 
-    expenses = manager.show_expenses()
-    total = manager.calculate_total()
+    expenses = ExpenseManager.show_expenses()
+    total = ExpenseManager.calculate_total()
     return render_template("index.html", expenses=expenses, total=total)
 
 
 # Remover gasto
 @app.route("/delete/<int:index>", methods=["POST"])
 def delete_expense(index):
-    manager.delete_expense(index)
+    ExpenseManager.delete_expense(index)
     return redirect(url_for("index"))
 
 
@@ -60,8 +60,8 @@ def delete_expense(index):
 def email():
     to_email = request.form["to_email"]
 
-    expenses = manager.show_expenses()
-    total = manager.calculate_total()
+    expenses = ExpenseManager.show_expenses()
+    total = ExpenseManager.calculate_total()
     expenses_text = "\n".join(
         [f"{expense['description']}: R${expense['amount']:.2f}" for expense in expenses]
     )
