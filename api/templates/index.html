@@ -13,11 +13,11 @@
     <h1>Gerenciador de Gastos</h1>
 
     <!-- Formulário para adicionar um novo gasto -->
-    <form method="POST">
+    <form id="expenseForm" method="POST">
         <label for="description">Descrição:</label>
-        <input type="text" id="description" name="description" required>
+        <input type="text" id="description" name="description" maxlength="100" required>
         <label for="amount">Valor (R$):</label>
-        <input type="number" id="amount" name="amount" step="0.01" required>
+        <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
         <button type="submit">Adicionar Gasto</button>
     </form>
 
@@ -26,7 +26,7 @@
     <ul>
         {% for expense in expenses %}
         <li>
-            {{ loop.index }}. {{ expense.description }}: R$ {{ expense.amount }}
+            {{ loop.index }}. {{ expense.description }}: R$ {{ expense.amount | format_number }}
             <form action="{{ url_for('delete_expense', index=loop.index0) }}" method="POST" style="display: inline;">
                 <button type="submit" class="delete-button">Remover</button>
             </form>
@@ -34,7 +34,7 @@
         {% endfor %}
     </ul>
 
-    <p>Total: R$ {{ total }}</p>
+    <p>Total: R$ {{ total | format_number }}</p>
 
     <!-- Formulário para enviar o email -->
     <form action="{{ url_for('email') }}" method="POST" id="emailForm">

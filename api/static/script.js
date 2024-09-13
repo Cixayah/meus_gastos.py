@@ -1,5 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const expenseForm = document.getElementById('expenseForm');
     const emailForm = document.getElementById('emailForm');
+
+    if (expenseForm) {
+        expenseForm.addEventListener('submit', function (event) {
+            const descriptionField = document.getElementById('description');
+            const amountField = document.getElementById('amount');
+            const description = descriptionField.value.trim();
+            const amount = parseFloat(amountField.value);
+
+            if (description.length > 100) {
+                event.preventDefault();
+                alert('A descrição deve ter no máximo 100 caracteres.');
+                return;
+            }
+
+            if (isNaN(amount) || amount <= 0) {
+                event.preventDefault();
+                alert('O valor do gasto deve ser maior que 0.');
+                return;
+            }
+
+            // Formata o valor para duas casas decimais
+            amountField.value = amount.toFixed(2);
+        });
+    }
 
     if (emailForm) {
         emailForm.addEventListener('submit', async function (event) {

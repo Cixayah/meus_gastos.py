@@ -38,6 +38,15 @@ class ExpenseManager:
             session.modified = True  # Atualiza a sessão após a remoção
 
 
+# Filtro customizado para formatar números
+@app.template_filter('format_number')
+def format_number(value):
+    try:
+        return f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except (ValueError, TypeError):
+        return value
+
+
 # Página principal
 @app.route("/", methods=["GET", "POST"])
 def index():
