@@ -9,7 +9,9 @@ import smtplib
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")  # Defina uma chave secreta para as sessões
+app.secret_key = os.getenv(
+    "SECRET_KEY", "chave_secreta_fallback"
+)  # Defina uma chave secreta para as sessões
 
 
 class ExpenseManager:
@@ -18,6 +20,7 @@ class ExpenseManager:
         if "expenses" not in session:
             session["expenses"] = []
         session["expenses"].append({"description": description, "amount": amount})
+        session.modified = True  # Garante que a sessão seja atualizada
 
     @staticmethod
     def show_expenses():
@@ -32,6 +35,7 @@ class ExpenseManager:
         """Remove o gasto pelo índice."""
         if "expenses" in session and 0 <= index < len(session["expenses"]):
             session["expenses"].pop(index)
+            session.modified = True  # Atualiza a sessão após a remoção
 
 
 # Página principal
